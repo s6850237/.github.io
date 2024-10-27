@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首頁</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 每行顯示兩個按鈕 */
+            gap: 20px;
+        }
+        .button {
+            background: #5cb85c; /* 綠色 */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1.5em; /* 讓字體更大 */
+        }
+        .button:hover {
+            background: #4cae4c; /* 深綠色 */
+        }
+        .checked {
+            background: red; /* 簽到狀態為紅色 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>首頁</h1>
+        <div class="button-grid">
+            <div class="button" onclick="handleClick('sign_in.html')">簽到</div>
+            <div class="button" onclick="handleClick('temperature_record.html')">體溫</div>
+            <div class="button" onclick="handleClick('restroom_record.html')">上廁所</div>
+            <div class="button" onclick="handleClick('clothes_record.html')">換衣物</div>
+        </div>
+    </div>
+
+    <script>
+        function handleClick(page) {
+            // 按鈕變紅色並延遲一毫秒後轉跳
+            const button = event.target;
+            button.classList.add('checked');
+            setTimeout(() => {
+                window.location.href = page;
+            }, 1); // 延遲一毫秒
+        }
+    </script>
+</body>
+</html>

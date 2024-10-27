@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簽到頁面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            display: flex;
+            justify-content: space-between; /* 使標題與按鈕在同一排 */
+            align-items: center; /* 垂直居中 */
+            margin-bottom: 20px; /* 下方間距 */
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 每行顯示三個按鈕 */
+            gap: 20px;
+        }
+        .student-button {
+            background: #5cb85c; /* 綠色 */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1.2em; /* 讓字體更大 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .student-button:hover {
+            background: #4cae4c; /* 深綠色 */
+        }
+        .student-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* 圓形 */
+            display: block;
+            margin-bottom: 10px; /* 圖片與文字間距 */
+        }
+        .checked {
+            background: red; /* 簽到狀態為紅色 */
+        }
+        .clear-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .clear-button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            簽到
+            <button class="clear-button" id="clearBtn">清除所有簽到</button>
+        </h1>
+        <div class="button-grid" id="studentGrid">
+            <!-- 學生按鈕將在這裡動態生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 學生資料
+        const students = [
+            { seatNumber: 1, name: "蘇家承", image: "https://via.placeholder.com/50" },
+            { seatNumber: 2, name: "張碩恩", image: "https://via.placeholder.com/50" },
+            { seatNumber: 3, name: "林書妤", image: "https://via.placeholder.com/50" },
+            { seatNumber: 4, name: "王怡碩", image: "https://via.placeholder.com/50" },
+            { seatNumber: 5, name: "廖允希", image: "https://via.placeholder.com/50" },
+            { seatNumber: 6, name: "蔡妤彤", image: "https://via.placeholder.com/50" },
+            { seatNumber: 7, name: "沈牧謙", image: "https://via.placeholder.com/50" },
+            { seatNumber: 8, name: "陳浩文", image: "https://via.placeholder.com/50" },
+            { seatNumber: 9, name: "周祐昕", image: "https://via.placeholder.com/50" },
+            { seatNumber: 10, name: "張安雨", image: "https://via.placeholder.com/50" },
+            { seatNumber: 11, name: "張采津", image: "https://via.placeholder.com/50" },
+            { seatNumber: 12, name: "林恩宇", image: "https://via.placeholder.com/50" },
+            { seatNumber: 13, name: "許懷中", image: "https://via.placeholder.com/50" },
+            { seatNumber: 14, name: "陳柔霏", image: "https://via.placeholder.com/50" },
+            { seatNumber: 15, name: "李享", image: "https://via.placeholder.com/50" },
+            { seatNumber: 16, name: "黃翊誠", image: "https://via.placeholder.com/50" },
+            { seatNumber: 17, name: "周宥妡", image: "https://via.placeholder.com/50" },
+            { seatNumber: 18, name: "郭家妤", image: "https://via.placeholder.com/50" },
+            { seatNumber: 19, name: "洪妘霏", image: "https://via.placeholder.com/50" },
+            { seatNumber: 20, name: "蕭子宏", image: "https://via.placeholder.com/50" },
+            { seatNumber: 21, name: "許湘芸", image: "https://via.placeholder.com/50" },
+            { seatNumber: 22, name: "林聖喆", image: "https://via.placeholder.com/50" },
+            { seatNumber: 23, name: "林聖恩", image: "https://via.placeholder.com/50" },
+            { seatNumber: 24, name: "潘苡禾", image: "https://via.placeholder.com/50" },
+            { seatNumber: 25, name: "葉佳蓁", image: "https://via.placeholder.com/50" },
+            { seatNumber: 26, name: "許菀涵", image: "https://via.placeholder.com/50" },
+            { seatNumber: 27, name: "謝燿宇", image: "https://via.placeholder.com/50" },
+        ];
+
+        // 在頁面加載後生成學生按鈕
+        window.onload = function() {
+            const studentGrid = document.getElementById('studentGrid');
+            students.forEach(student => {
+                const button = document.createElement('div');
+                button.className = 'student-button';
+                button.innerHTML = `
+                    <img src="${student.image}" alt="${student.name}" class="student-image">
+                    <p>${student.name}</p>
+                    <p>座號: ${student.seatNumber}</p>
+                `;
+                // 設置按鈕的唯一 ID
+                button.id = `student-${student.seatNumber}`;
+                
+                // 從 Local Storage 讀取按鈕狀態
+                const storedStatus = localStorage.getItem(`student-${student.seatNumber}`);
+                if (storedStatus === 'checked') {
+                    button.classList.add('checked'); // 設置為紅色
+                }
+                
+                button.onclick = function() {
+                    // 切換簽到狀態
+                    if (button.classList.contains('checked')) {
+                        button.classList.remove('checked'); // 取消簽到
+                        localStorage.setItem(`student-${student.seatNumber}`, ''); // 清除 Local Storage 狀態
+                    } else {
+                        button.classList.add('checked'); // 簽到
+                        localStorage.setItem(`student-${student.seatNumber}`, 'checked'); // 更新 Local Storage 狀態
+                    }
+                };
+                studentGrid.appendChild(button);
+            });
+        };
+
+        // 清除所有按鈕狀態的功能
+        document.getElementById('clearBtn').onclick = function() {
+            const buttons = document.querySelectorAll('.student-button');
+            buttons.forEach(button => {
+                button.classList.remove('checked'); // 移除所有按鈕的紅色狀態
+                localStorage.setItem(button.id, ''); // 清除 Local Storage 狀態
+            });
+        };
+    </script>
+</body>
+</html>

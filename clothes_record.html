@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>換衣服紀錄</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef1f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            margin-top: 20px;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #5bc0de;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #31b0d5;
+        }
+        .clear-button {
+            background-color: #d9534f;
+        }
+        .clear-button:hover {
+            background-color: #c9302c;
+        }
+        .view-records {
+            margin-top: 20px;
+        }
+        .record {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #e5e5e5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>換衣服紀錄</h1>
+        
+        <div class="form-group">
+            <label for="studentSelect">選擇學生：</label>
+            <select id="studentSelect">
+                <option value="">請選擇</option>
+                <option value="1">蘇家承</option>
+                <option value="2">張碩恩</option>
+                <option value="3">林書妤</option>
+                <option value="4">王怡碩</option>
+                <option value="5">廖允希</option>
+                <option value="6">蔡妤彤</option>
+                <option value="7">沈牧謙</option>
+                <option value="8">陳浩文</option>
+                <option value="9">周祐昕</option>
+                <option value="10">張安雨</option>
+                <option value="11">張采津</option>
+                <option value="12">林恩宇</option>
+                <option value="13">許懷中</option>
+                <option value="14">陳柔霏</option>
+                <option value="15">李享</option>
+                <option value="16">黃翊誠</option>
+                <option value="17">周宥妡</option>
+                <option value="18">郭家妤</option>
+                <option value="19">洪妘霏</option>
+                <option value="20">蕭子宏</option>
+                <option value="21">許湘芸</option>
+                <option value="22">林聖喆</option>
+                <option value="23">林聖恩</option>
+                <option value="24">潘苡禾</option>
+                <option value="25">葉佳蓁</option>
+                <option value="26">許菀涵</option>
+                <option value="27">謝燿宇</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="clothesDescription">換衣服描述：</label>
+            <input type="text" id="clothesDescription" placeholder="輸入換的衣服內容" />
+        </div>
+
+        <button id="saveBtn">儲存紀錄</button>
+        <button class="clear-button" id="clearBtn">清除所有資料</button>
+
+        <div class="view-records">
+            <h2>檢視紀錄</h2>
+            <div id="recordsOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        const studentSelect = document.getElementById('studentSelect');
+        const clothesDescription = document.getElementById('clothesDescription');
+        const recordsOutput = document.getElementById('recordsOutput');
+
+        // 儲存的紀錄
+        let clothesData = JSON.parse(localStorage.getItem('clothesData')) || {};
+
+        // 儲存紀錄
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            const studentId = studentSelect.value;
+            const description = clothesDescription.value;
+
+            if (studentId && description) {
+                clothesData[studentId] = clothesData[studentId] || [];
+                clothesData[studentId].push(description);
+                localStorage.setItem('clothesData', JSON.stringify(clothesData));
+
+                alert('紀錄已儲存！');
+                clothesDescription.value = ''; // 清空輸入框
+                viewRecords(); // 更新顯示的紀錄
+            } else {
+                alert('請選擇學生並輸入描述！');
+            }
+        });
+
+        // 檢視紀錄
+        function viewRecords() {
+            recordsOutput.innerHTML = ''; // 清空之前的紀錄
+            for (const studentId in clothesData) {
+                const studentName = studentSelect.options[studentId].text; // 根據選擇的學生獲取姓名
+                const descriptions = clothesData[studentId].join(', ');
+                recordsOutput.innerHTML += `<div class="record">${studentName}: ${descriptions}</div>`;
+            }
+        }
+
+        // 清除所有資料
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            clothesData = {};
+            localStorage.removeItem('clothesData');
+            recordsOutput.innerHTML = ''; // 清空檢視紀錄
+            alert('所有資料已清除！');
+        });
+
+        // 初始化
+        viewRecords(); // 初次載入時顯示紀錄
+    </script>
+</body>
+</html>
+

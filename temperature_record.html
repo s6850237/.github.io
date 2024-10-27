@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>體溫記錄頁面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaeaea;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: relative; /* 新增此行 */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .student-input {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .temperature-input {
+            width: calc(48% - 10px);
+            padding: 8px;
+            margin-right: 5%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .temperature-input:last-child {
+            margin-right: 0;
+        }
+        .clear-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            position: absolute; /* 新增此行 */
+            top: 20px; /* 新增此行 */
+            right: 20px; /* 新增此行 */
+            font-size: 16px;
+        }
+        .clear-button:hover {
+            background-color: #c9302c;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <button class="clear-button" id="clearBtn">清除所有資料</button> <!-- 移動按鈕到上方 -->
+        <h1>體溫記錄</h1>
+        <div class="form-group">
+            <label for="daySelect">選擇星期：</label>
+            <select id="daySelect">
+                <option value="">請選擇</option>
+                <option value="Monday">星期一</option>
+                <option value="Tuesday">星期二</option>
+                <option value="Wednesday">星期三</option>
+                <option value="Thursday">星期四</option>
+                <option value="Friday">星期五</option>
+            </select>
+        </div>
+        <table class="table" id="studentTemperatureInputs"></table>
+    </div>
+
+    <script>
+        const students = [
+            "蘇家承", "張碩恩", "林書妤", "王怡碩", "廖允希",
+            "蔡妤彤", "沈牧謙", "陳浩文", "周祐昕", "張安雨",
+            "張采津", "林恩宇", "許懷中", "陳柔霏", "李享",
+            "黃翊誠", "周宥妡", "郭家妤", "洪妘霏", "蕭子宏",
+            "許湘芸", "林聖喆", "林聖恩", "潘苡禾", "葉佳蓁",
+            "許菀涵", "謝燿宇"
+        ];
+
+        let temperatureData = JSON.parse(localStorage.getItem('temperatureData')) || {};
+
+        const daySelect = document.getElementById('daySelect');
+        const studentTemperatureInputs = document.getElementById('studentTemperatureInputs');
+
+        // 生成學生的體溫輸入框
+        function createTemperatureInputs() {
+            studentTemperatureInputs.innerHTML = `<tr>
+                <th>學生姓名</th>
+                <th>上午體溫</th>
+                <th>下午體溫</th>
+            </tr>`; // 清空之前的輸入框並添加表頭
+            
+            students.forEach((student, index) => {
+                const studentRow = document.createElement('tr');
+                studentRow.innerHTML = `
+                    <td>${student} (座號: ${index + 1})</td>
+                    <td><input type="number" id="morningTemp-${index}" placeholder="上午體溫" min="36" max="39" step="0.1" class="temperature-input" /></td>
+                    <td><input type="number" id="afternoonTemp-${index}" placeholder="下午體溫" min="36" max="39" step="0.1" class="temperature-input" /></td>
+                `;
+                studentTemperatureInputs.appendChild(studentRow);
+            });
+        }
+
+        daySelect.addEventListener('change', function() {
+            const selectedDay = daySelect.value;
+            if (selectedDay) {
+                // 根據選擇的星期更新輸入框的值
+                createTemperatureInputs(); // 生成輸入框
+
+                // 填入之前的體溫資料
+                if (temperatureData[selectedDay]) {
+                    students.forEach((student, index) => {
+                        document.getElementById(`morningTemp-${index}`).value = temperatureData[selectedDay][index]?.morning || '';
+                        document.getElementById(`afternoonTemp-${index}`).value = temperatureData[selectedDay][index]?.afternoon || '';
+                    });
+                }
+            } else {
+                studentTemperatureInputs.innerHTML = ''; // 清空輸入框
+            }
+        });
+
+        // 監聽輸入框的變化
+        function updateTemperatureData() {
+            const selectedDay = daySelect.value;
+            if (selectedDay) {
+                temperatureData[selectedDay] = temperatureData[selectedDay] || [];
+                students.forEach((student, index) => {
+                    const morningTemp = document.getElementById(`morningTemp-${index}`).value;
+                    const afternoonTemp = document.getElementById(`afternoonTemp-${index}`).value;
+
+                    temperatureData[selectedDay][index] = {
+                        morning: morningTemp,
+                        afternoon: afternoonTemp
+                    };
+                });
+                localStorage.setItem('temperatureData', JSON.stringify(temperatureData));
+            }
+        }
+
+        // 監聽輸入框
+        studentTemperatureInputs.addEventListener('input', updateTemperatureData);
+
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            // 清空所有資料
+            temperatureData = {};
+            localStorage.removeItem('temperatureData');
+            daySelect.value = '';
+            studentTemperatureInputs.innerHTML = ''; // 清空輸入框
+            alert('所有資料已清除！');
+        });
+
+        // 初始化
+        createTemperatureInputs();
+    </script>
+</body>
+</html>

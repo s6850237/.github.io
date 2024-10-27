@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上廁所情況記錄</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .clear-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .clear-button:hover {
+            background-color: #c9302c;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>上廁所情況記錄</h1>
+        
+        <div class="form-group">
+            <label for="studentSelect">選擇學生：</label>
+            <select id="studentSelect">
+                <option value="">請選擇</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="conditionSelect">選擇情況：</label>
+            <select id="conditionSelect">
+                <option value="正常">正常</option>
+                <option value="腹瀉">腹瀉</option>
+                <option value="便祕">便祕</option>
+            </select>
+        </div>
+
+        <button id="submitBtn">提交</button>
+        
+        <div class="result" id="resultDisplay"></div>
+        
+        <button class="clear-button" id="clearBtn">清除檢視狀態的所有內容</button>
+    </div>
+
+    <script>
+        const students = [
+            "蘇家承", "張碩恩", "林書妤", "王怡碩", "廖允希",
+            "蔡妤彤", "沈牧謙", "陳浩文", "周祐昕", "張安雨",
+            "張采津", "林恩宇", "許懷中", "陳柔霏", "李享",
+            "黃翊誠", "周宥妡", "郭家妤", "洪妘霏", "蕭子宏",
+            "許湘芸", "林聖喆", "林聖恩", "潘苡禾", "葉佳蓁",
+            "許菀涵", "謝燿宇"
+        ];
+
+        // 載入學生選項
+        const studentSelect = document.getElementById('studentSelect');
+        students.forEach(student => {
+            const option = document.createElement('option');
+            option.value = student;
+            option.textContent = student;
+            studentSelect.appendChild(option);
+        });
+
+        // 提交資料
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const student = studentSelect.value;
+            const condition = document.getElementById('conditionSelect').value;
+
+            if (student) {
+                // 儲存到 Local Storage
+                const record = JSON.parse(localStorage.getItem('restroomRecords')) || {};
+                record[student] = condition;
+                localStorage.setItem('restroomRecords', JSON.stringify(record));
+                
+                // 顯示結果
+                displayRecords();
+                alert(`${student} 的狀態已記錄為 ${condition}`);
+            } else {
+                alert('請選擇學生！');
+            }
+        });
+
+        // 顯示檢視狀態
+        function displayRecords() {
+            const recordDisplay = document.getElementById('resultDisplay');
+            recordDisplay.innerHTML = ''; // 清空顯示區域
+            
+            const records = JSON.parse(localStorage.getItem('restroomRecords')) || {};
+            if (Object.keys(records).length === 0) {
+                recordDisplay.textContent = '尚未有任何紀錄。';
+            } else {
+                Object.entries(records).forEach(([student, condition]) => {
+                    const div = document.createElement('div');
+                    div.textContent = `${student}：${condition}`;
+                    recordDisplay.appendChild(div);
+                });
+            }
+        }
+
+        // 清除所有檢視狀態的內容
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            localStorage.removeItem('restroomRecords');
+            document.getElementById('resultDisplay').innerHTML = '';
+            alert('檢視狀態的所有內容已清除！');
+        });
+
+        // 初始化時顯示現有的紀錄
+        displayRecords();
+    </script>
+</body>
+</html>
+
